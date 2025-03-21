@@ -4,13 +4,14 @@ from config import client, MODEL_NAME, histories
 
 
 async def planning(prompt: str):
-    histories.append({
+    messages = [{"role": "system", "content": "你是一个 Function Planner"}]
+    messages.append({
         "role": "user",
         "content": prompt
     })
     completion = client.chat.completions.create(
         model=MODEL_NAME,
-        messages=histories
+        messages=messages
     )
     return completion.choices[0].message.content
 
@@ -30,11 +31,12 @@ async def function_planning(query: str):
 1. 工具名称必须从以下选择：[{tool_names}]，禁止编造新工具。
 2. 参数需从输入中直接抽取，禁止自行生成或假设值。
 3. 若需多工具协作，或无法匹配具体工具，输出 `general_tool()`。
-4. 最终输出格式为：工具名(参数名='参数值')，例如 `add_required_spot(spot_name='野生动物园')`。
+4. 最终输出格式为：工具名(参数名='参数值')，例如 `spot_route_recommend(spot_name='上海')`。
+5. 如果工具没有明确说明需要参数则不要带有参数输出，如果带有参数则严格按照给定参数进行输出。
 
 ### 示例：
-用户输入: 将野生动物园加入必选
-输出: add_required_spot(spot_name='野生动物园')
+用户输入: 上海一日游
+输出: spot_route_recommend(spot_name='上海')
 
 用户输入: 青岛栈桥的开放时间是？
 输出: search_spot_info(spot_list=[青岛栈桥])
@@ -47,3 +49,17 @@ async def function_planning(query: str):
 """
     response = await planning(prompt)
     return response
+
+
+async def optimization(message: list):
+    # 多轮改写优化api
+    messages = [{
+        "role": "system",
+        "content": "你是一个专业的大模型改写优化家,总结下面的多轮对话内容"
+    }]
+    messages.extend(message)
+    completion = client.chat.completions.create(
+        model=MODEL_NAME,
+        messages=messages
+    )
+    return completion.choices[0].message.content

@@ -20,7 +20,7 @@ FUNCTION_CALLING_TOOLS = [
     },
     {
         "name_for_model": "spot_route_recommend",
-        "name_for_human": "景点路线推荐",
+        "name_for_human": "路线推荐",
         "description_for_human": "搜索指定景点的旅游路线信息并整理推荐给用户",
         "parameters": [{
             "description": "需要查询的景点的名称",
@@ -62,6 +62,11 @@ FUNCTION_CALLING_TOOLS = [
     #         }
     #     }]
     # },
+    # {
+    #     "name_for_model": "question_more",
+    #     "name_for_human": "追问api",
+    #     "description_for_human": "处理内容，判断是否需要追问，返回是或否，指返回一个字"
+    # },
     {
         "name_for_model": "general_tool",
         "name_for_human": "通用工具",
@@ -82,9 +87,9 @@ def parse_tool_text_info(tools, template):
         if "parameters" in tool and tool["parameters"]:
             desc += "\n参数："
             for param in tool["parameters"]:
-                desc += f"\n- {param['name']}: {param['description']} (必填: {param['required']})"
+                desc += f"\n- {param['name']}: {param['description']} (是否必填必填: {param['required']})"
                 if "schema" in param:
-                    desc += f"\n  - 返回类型: {param['schema']['type']})"
+                    desc += f"\n  - 参数类型: {param['schema']['type']})"
         tool_desc.append(desc)
         tool_names.append(tool["name_for_model"])
 
