@@ -54,5 +54,7 @@ htmlcov/
 .coverage.*
 .cache
 coverage.xml
-*.cover 
+*.cover
 
+# Project specific
+image.png
