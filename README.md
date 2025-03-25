@@ -1,26 +1,3 @@
-# 智能旅游推荐系统
-
-基于 FastAPI 和通义千问（Qwen）大模型的智能旅游推荐系统，提供景点推荐、路线规划和智能对话等功能。
-
-## 核心功能
-
-### 1. 智能对话
-- 基于通义千问大模型的自然语言交互
-- 多轮对话历史记录和优化
-- 上下文理解和意图识别
-
-### 2. 景点推荐
-- 智能景点搜索和筛选
-- 基于用户偏好的个性化推荐
-- 景点详细信息展示（位置、描述、标签等）
-- 景点评分和评价系统
-
-### 3. 路线规划
-- 多景点智能路线规划
-- 交通方式推荐
-- 时间和成本估算
-- 路线优化和调整
-
 ## 技术架构
 
 ### 后端技术栈
@@ -86,23 +63,15 @@
 
 1. **环境准备**
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # Windows: venv\Scripts\activate
    pip install -r requirements.txt
    ```
 
-2. **配置设置**
-   ```bash
-   cp .env.example .env
-   # 编辑 .env 文件，配置必要的环境变量
-   ```
-
-3. **初始化数据库**
+2. **初始化数据库**
    ```bash
    python app/db/init_db.py
    ```
 
-4. **启动服务**
+3. **启动服务**
    ```bash
    uvicorn app.main:app --reload --port 3040
    ```
@@ -113,20 +82,23 @@
 - Swagger UI: `http://localhost:3040/docs`
 - ReDoc: `http://localhost:3040/redoc`
 
-## 开发规范
 
-- 遵循 PEP 8 Python 代码规范
-- 使用 Git Flow 工作流
-- 完整的单元测试覆盖
-- 详细的代码注释和文档
+# 基于 function plan 的旅游景点/路线/推荐
+1. 获取用户输入，经过 function planning 决策调用 funcName，function planning 采用function calling 范式调用格式
 
-## 贡献指南
+2. 经过多轮改写 api 总结历史对话信息
 
-1. Fork 项目
-2. 创建特性分支
-3. 提交变更
-4. 发起 Pull Request
+3. 得到function name及参数后执行该工具
 
-## 许可证
+4. 整合结果，加入历史对话
 
-MIT License 
+模块化
+多轮对话上下文管理和多轮 summary api （管理优化对话上下文信息）
+function planning （意图识别，调用能力）
+ RAG 模块 （检索最相关的信息重构上下文）
+Tools api 模块 （调用专有能力处理）
+数据库管理模块 （作为元数据存储及历史对话记录）
+向量数据库管理模块 （存储元数据及其向量化数据）
+
+技术点：
+fastapi、LLM api、意图识别算法、RAG、向量数据库，sqlalchemy、function calling、MCP协议、多路并行API调用

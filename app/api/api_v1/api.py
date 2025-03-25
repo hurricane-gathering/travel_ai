@@ -3,7 +3,7 @@ from app.models.base import ResponseStatus, BaseResponse
 from app.services.qwen_service import qwen_service
 from app.services.executor import execute_tool
 from app.core.logger import logger
-from app.core.tools import tool_desc
+from app.core.tools import FUNCTION_CALLING_TOOLS, tool_desc
 from typing import List, Dict, Any
 import json
 
@@ -105,6 +105,7 @@ def generate_prompt(query: str) -> str:
 
 @api_router.post("/chat", response_model=BaseResponse)
 async def chat_endpoint(query: str):
+    print(f"可调用工具数量：{len(FUNCTION_CALLING_TOOLS)}")
     """
     处理用户查询
     """
@@ -130,7 +131,9 @@ async def chat_endpoint(query: str):
                 "content": optimized_content
             })
         messages.append({"role": "user", "content": prompt})
+        # 意图识别，输出需要调用的工具
         response = await qwen_service.create_completion(messages)
+        # print(f'response: {response}')
         
         # 5. 执行工具调用
         result = await execute_tool(response, optimized_content, query)

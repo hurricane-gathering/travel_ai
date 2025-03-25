@@ -35,7 +35,7 @@ class ToolExecutor:
             
             # 添加优化内容到参数中
             if optimized_content:
-                parameters["context"] = optimized_content
+                parameters["summary"] = optimized_content
                 
             logger.info(f"执行工具函数: {func_name}, 参数: {parameters}")
             result = await tool_func(**parameters)
@@ -43,8 +43,9 @@ class ToolExecutor:
             # 保存执行记录
             with Session() as session:
                 history = ChatHistory(
-                    role="tool",
-                    content=f"工具 {func_name} 执行结果: {result}"
+                    session_id="tool_execution",  # 使用固定的会话ID标识工具执行
+                    user_query="",  # 工具执行不需要用户查询
+                    assistant_response=f"工具 {func_name} 执行结果: {result}"  # 将结果存储在助手回复字段
                 )
                 session.add(history)
                 session.commit()

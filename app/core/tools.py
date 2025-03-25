@@ -4,15 +4,7 @@ from app.models.base import SpotInfo, RouteInfo
 from app.db.session import Session
 from app.db.crud import create_spot, get_spots, create_route
 import json
-from app.services.tools import (
-    general_tool,
-    search_spot_info,
-    spot_recommend,
-    spot_route_recommend,
-    deep_search,
-    add_required_spot,
-    travel_tips
-)
+from app.services.tools import tool_funcs
 
 # 工具描述
 tool_desc = """
@@ -61,14 +53,9 @@ class ToolRegistry:
 # 创建工具注册器实例
 tool_registry = ToolRegistry()
 
-# 注册所有工具函数
-tool_registry.register("general_tool", general_tool)
-tool_registry.register("search_spot_info", search_spot_info)
-tool_registry.register("spot_recommend", spot_recommend)
-tool_registry.register("spot_route_recommend", spot_route_recommend)
-tool_registry.register("deep_search", deep_search)
-tool_registry.register("add_required_spot", add_required_spot)
-tool_registry.register("travel_tips", travel_tips)
+# 注册所有工具
+for tool_name, tool_func in tool_funcs.items():
+    tool_registry.register(tool_name, tool_func)
 
 async def search_spots(query: str) -> List[Dict]:
     """搜索景点信息"""

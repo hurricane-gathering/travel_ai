@@ -30,3 +30,7 @@ class Settings(BaseSettings):
         case_sensitive = True
 
 settings = Settings() 
+from pathlib import Path
+
+# 获取项目根目录
+BASE_DIR = Path(__file__).resolve().parent.parent.parent

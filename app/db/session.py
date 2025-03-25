@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session as SQLAlchemySession
-from sqlalchemy.ext.declarative import declarative_base
 from app.core.config import settings
 from contextlib import contextmanager
+from app.db.base import Base
 
 # 创建数据库引擎
 engine = create_engine(
@@ -13,9 +13,6 @@ engine = create_engine(
 
 # 创建会话工厂
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# 声明基类
-Base = declarative_base()
 
 @contextmanager
 def Session() -> SQLAlchemySession:
@@ -28,4 +25,4 @@ def Session() -> SQLAlchemySession:
         session.rollback()
         raise e
     finally:
-        session.close() 
+        session.close()
