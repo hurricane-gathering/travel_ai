@@ -12,7 +12,7 @@ api_router = APIRouter()
 # 对话历史记录
 histories = [{
     "role": "system",
-    "content": "你是一个专业的出行推荐官"
+    "content": "你是一个专业资深的出行推荐官，能够更加用户需求给出精准的出行推荐"
 }]
 
 def print_chat_history():
@@ -33,7 +33,7 @@ async def optimization(messages: list) -> str:
         
     system_messages = [{
         "role": "system",
-        "content": "你是一个专业的大模型改写优化家,总结下面的多轮对话内容"
+        "content": "你是一个专业的大模型改写优化家,总结下面的多轮对话内容并优化用户提出的需求"
     }]
     system_messages.extend(messages)
     
@@ -105,14 +105,13 @@ def generate_prompt(query: str) -> str:
 
 @api_router.post("/chat", response_model=BaseResponse)
 async def chat_endpoint(query: str):
-    print(f"可调用工具数量：{len(FUNCTION_CALLING_TOOLS)}")
     """
     处理用户查询
     """
     try:
         # 1. 添加用户消息到历史记录
         histories.append({"role": "user", "content": query})
-        print_chat_history()  # 打印添加用户消息后的历史
+        # print_chat_history()  # 打印添加用户消息后的历史
         
         # 2. 优化多轮对话内容
         optimized_content = await optimization(histories[-5:])  # 只取最近5轮对话进行优化
@@ -137,10 +136,10 @@ async def chat_endpoint(query: str):
         
         # 5. 执行工具调用
         result = await execute_tool(response, optimized_content, query)
-        
+        logger.info(f"result: {result}")
         # 6. 添加助手回复到历史记录
         histories.append({"role": "assistant", "content": result})
-        print_chat_history()  # 打印添加助手回复后的历史
+        # print_chat_history()  # 打印添加助手回复后的历史
         
         # 7. 返回结果
         return BaseResponse(

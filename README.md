@@ -1,9 +1,8 @@
 ## 技术架构
 
 ### 后端技术栈
-- **Web 框架**: FastAPI
+- **框架**: FastAPI
 - **数据库**: SQLAlchemy ORM + SQLite
-- **大模型集成**: 通义千问 API
 - **API 文档**: Swagger/OpenAPI
 
 ### 核心模块

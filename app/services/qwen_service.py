@@ -15,7 +15,7 @@ class QwenService:
         self,
         messages: List[Dict[str, str]],
         temperature: float = 0.7,
-        max_tokens: int = 2000,
+        max_tokens: int = 20000,
         **kwargs
     ) -> str:
         """

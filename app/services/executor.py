@@ -65,32 +65,32 @@ class ToolExecutor:
             results.append(result)
         return results
 
-async def execute_single_function(func_name: str, params: Dict[str, Any], summary: str) -> str:
-    """执行单一功能"""
-    if func_name not in tool_funcs:
-        raise ValueError(f"未知工具: {func_name}")
+# async def execute_single_function(func_name: str, params: Dict[str, Any], summary: str) -> str:
+#     """执行单一功能"""
+#     if func_name not in tool_funcs:
+#         raise ValueError(f"未知工具: {func_name}")
     
-    params["summary"] = summary
-    return await tool_funcs[func_name](**params)
+#     params["summary"] = summary
+#     return await tool_funcs[func_name](**params)
 
-async def execute_multi_function(functions: List[Dict[str, Any]], summary: str) -> str:
-    """执行多功能调用，串联结果"""
-    results = []
-    current_summary = summary
+# async def execute_multi_function(functions: List[Dict[str, Any]], summary: str) -> str:
+#     """执行多功能调用，串联结果"""
+#     results = []
+#     current_summary = summary
     
-    for func_call in functions:
-        func_name = func_call.get("funcName")
-        params = {param.get("name"): param.get("value") for param in func_call.get("parameters", [])}
-        params["summary"] = current_summary
+#     for func_call in functions:
+#         func_name = func_call.get("funcName")
+#         params = {param.get("name"): param.get("value") for param in func_call.get("parameters", [])}
+#         params["summary"] = current_summary
         
-        if func_name not in tool_funcs:
-            raise ValueError(f"未知工具: {func_name}")
+#         if func_name not in tool_funcs:
+#             raise ValueError(f"未知工具: {func_name}")
         
-        result = await tool_funcs[func_name](**params)
-        results.append(result)
-        current_summary = f"{current_summary}\n{result}"
+#         result = await tool_funcs[func_name](**params)
+#         results.append(result)
+#         current_summary = f"{current_summary}\n{result}"
     
-    return "\n".join(results)
+#     return "\n".join(results)
 
 async def execute_tool(response: str, optimized_content: str = "", query: str = "") -> str:
     """执行工具调用"""

@@ -7,29 +7,29 @@ import json
 from app.services.tools import tool_funcs
 
 # 工具描述
-tool_desc = """
-可用工具函数列表:
-1. search_spot_info: 搜索景点信息
-   - 参数: spot_list (景点列表)
+# tool_desc = """
+# 可用工具函数列表:
+# 1. search_spot_info: 搜索景点信息
+#    - 参数: spot_list (景点列表)
    
-2. spot_recommend: 景点推荐
-   - 参数: season (季节), days (天数), preference (偏好)
+# 2. spot_recommend: 景点推荐
+#    - 参数: season (季节), days (天数), preference (偏好)
    
-3. spot_route_recommend: 路线规划
-   - 参数: spot_name (景点名称), transport (交通方式), time_budget (时间预算)
+# 3. spot_route_recommend: 路线规划
+#    - 参数: spot_name (景点名称), transport (交通方式), time_budget (时间预算)
    
-4. deep_search: 深度搜索
-   - 参数: focus (关注点)
+# 4. deep_search: 深度搜索
+#    - 参数: focus (关注点)
    
-5. add_required_spot: 添加必选景点
-   - 参数: spot_name (景点名称), reason (原因)
+# 5. add_required_spot: 添加必选景点
+#    - 参数: spot_name (景点名称), reason (原因)
    
-6. travel_tips: 旅行贴士
-   - 参数: destination (目的地), aspect (关注方面)
+# 6. travel_tips: 旅行贴士
+#    - 参数: destination (目的地), aspect (关注方面)
    
-7. general_tool: 通用工具
-   - 参数: query (查询内容)
-"""
+# 7. general_tool: 通用工具
+#    - 参数: query (查询内容)
+# """
 
 class ToolRegistry:
     """工具注册器"""
@@ -57,48 +57,50 @@ tool_registry = ToolRegistry()
 for tool_name, tool_func in tool_funcs.items():
     tool_registry.register(tool_name, tool_func)
 
-async def search_spots(query: str) -> List[Dict]:
-    """搜索景点信息"""
-    logger.info(f"搜索景点: {query}")
-    try:
-        with Session() as session:
-            spots = get_spots(session, query)
-            return [spot.to_dict() for spot in spots]
-    except Exception as e:
-        logger.error(f"搜索景点失败: {str(e)}")
-        return []
+logger.info(f"可调用工具数量：{len(tool_registry.list_tools())}")
 
-async def plan_route(spots: List[str]) -> Dict:
-    """规划景点路线"""
-    logger.info(f"规划路线: {spots}")
-    try:
-        # 这里可以添加实际的路线规划算法
-        route = RouteInfo(
-            spots=spots,
-            order=list(range(len(spots))),
-            duration="1天",
-            description=f"包含景点: {', '.join(spots)}"
-        )
-        return route.to_dict()
-    except Exception as e:
-        logger.error(f"路线规划失败: {str(e)}")
-        return {}
+# async def search_spots(query: str) -> List[Dict]:
+#     """搜索景点信息"""
+#     logger.info(f"搜索景点: {query}")
+#     try:
+#         with Session() as session:
+#             spots = get_spots(session, query)
+#             return [spot.to_dict() for spot in spots]
+#     except Exception as e:
+#         logger.error(f"搜索景点失败: {str(e)}")
+#         return []
 
-async def add_spot(name: str, description: str, location: str) -> Dict:
-    """添加新景点"""
-    logger.info(f"添加景点: {name}")
-    try:
-        spot = SpotInfo(
-            name=name,
-            description=description,
-            location=location
-        )
-        with Session() as session:
-            new_spot = create_spot(session, spot)
-            return new_spot.to_dict()
-    except Exception as e:
-        logger.error(f"添加景点失败: {str(e)}")
-        return {}
+# async def plan_route(spots: List[str]) -> Dict:
+#     """规划景点路线"""
+#     logger.info(f"规划路线: {spots}")
+#     try:
+#         # 这里可以添加实际的路线规划算法
+#         route = RouteInfo(
+#             spots=spots,
+#             order=list(range(len(spots))),
+#             duration="1天",
+#             description=f"包含景点: {', '.join(spots)}"
+#         )
+#         return route.to_dict()
+#     except Exception as e:
+#         logger.error(f"路线规划失败: {str(e)}")
+#         return {}
+
+# async def add_spot(name: str, description: str, location: str) -> Dict:
+#     """添加新景点"""
+#     logger.info(f"添加景点: {name}")
+#     try:
+#         spot = SpotInfo(
+#             name=name,
+#             description=description,
+#             location=location
+#         )
+#         with Session() as session:
+#             new_spot = create_spot(session, spot)
+#             return new_spot.to_dict()
+#     except Exception as e:
+#         logger.error(f"添加景点失败: {str(e)}")
+#         return {}
 
 FUNCTION_CALLING_TOOLS = [
     {

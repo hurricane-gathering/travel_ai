@@ -61,34 +61,48 @@ class VectorStore:
             # 获取查询向量
             query_vector = self.get_embedding(query)
             
-            # 确保索引存在
-            self.init_index(collection_name)
+            # 检查数据库中的记录数量
+            with Session() as session:
+                record_count = session.query(VectorIndex).filter(
+                    VectorIndex.collection_name == collection_name
+                ).count()
+                
+                if record_count == 0:
+                    logger.warning(f"集合 {collection_name} 中没有记录")
+                    return []
+                    
+                # 如果索引不存在，从数据库重建索引
+                if collection_name not in self.indices:
+                    logger.info(f"从数据库重建集合 {collection_name} 的索引")
+                    self.rebuild_index(collection_name)
             
             # 执行搜索
             D, I = self.indices[collection_name].search(
                 np.array([query_vector]), 
-                k
+                min(k, record_count)  # 确保k不超过记录数量
             )
             
             # 获取结果
             results = []
             with Session() as session:
+                # 获取该集合的所有向量索引记录
+                vector_indices = session.query(VectorIndex).filter(
+                    VectorIndex.collection_name == collection_name
+                ).all()
+                
+                # 使用FAISS返回的索引位置获取对应的记录
                 for i, (distance, idx) in enumerate(zip(D[0], I[0])):
-                    if idx < 0:  # FAISS返回-1表示无效结果
+                    if idx < 0 or idx >= len(vector_indices):  # FAISS返回-1表示无效结果
                         continue
                         
-                    vector_index = session.query(VectorIndex).filter(
-                        VectorIndex.collection_name == collection_name,
-                        VectorIndex.id == idx
-                    ).first()
+                    vector_index = vector_indices[idx]
+                    results.append({
+                        "record_id": vector_index.record_id,
+                        "distance": float(distance),
+                        "metadata": vector_index.meta_info
+                    })
                     
-                    if vector_index:
-                        results.append({
-                            "record_id": vector_index.record_id,
-                            "distance": float(distance),
-                            "metadata": vector_index.meta_info
-                        })
-                        
+            logger.info(f"向量搜索结果 [{collection_name}]: {results}")
             return results
             
         except Exception as e:
@@ -115,8 +129,9 @@ class VectorStore:
                     # 重建FAISS索引
                     all_vectors = np.array([np.array(v.vector) for v in vectors])
                     self.indices[collection_name].add(all_vectors)
-                    
-            logger.info(f"重建向量索引完成: {collection_name}")
+                    logger.info(f"重建向量索引完成: {collection_name}, 添加了 {len(vectors)} 条记录")
+                else:
+                    logger.warning(f"集合 {collection_name} 中没有记录，无法重建索引")
             
         except Exception as e:
             logger.error(f"重建向量索引失败: {str(e)}")
